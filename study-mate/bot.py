@@ -21,10 +21,7 @@ client = discord.Client(intents=intents)
 # 음성채널 입장 시간을 저장할 딕셔너리
 voice_channel_entry_times = {}
 
-# 특정 텍스트 채널 ID (스터디-메이트-기록시간)
-# TARGET_TEXT_CHANNEL_ID = 1330548352550568038  # 스터디-메이트-기록시간 채널 ID
-
-
+# 봇의 상태 메시지
 @client.event
 async def on_ready():  # 봇이 실행되면 한 번 실행됨
     print(f"Logged in as {client.user}")
@@ -33,6 +30,7 @@ async def on_ready():  # 봇이 실행되면 한 번 실행됨
         activity=discord.Game("영웅이와 야스")
     )
 
+# 특정 메시지 입력시 봇의 응답
 @client.event
 async def on_message(message):
     if message.content == "김영웅 바보":  # 메시지 감지
