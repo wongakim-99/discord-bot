@@ -2,6 +2,7 @@ import discord, asyncio
 from config.config import DISCORD_TOKEN, TARGET_TEXT_CHANNEL_ID
 from events.attendance_check import register_attendance_events
 from commands.general import register_general_commands
+from utils.db_test_connection import test_connection
 
 # Gateway Intents 설정
 intents = discord.Intents.default()
@@ -17,7 +18,7 @@ async def on_ready():  # 봇이 실행되면 한 번 실행됨
     print(f"Logged in as {client.user}")
     await client.change_presence(
         status=discord.Status.online, 
-        activity=discord.Game("영웅이와 야스")
+        activity=discord.Game("개발 테스트 중입니다...")
     )
 
 # 이벤트 및 명령어 등록
@@ -26,4 +27,6 @@ register_general_commands(client)
 
 # 봇 실행
 if __name__ == "__main__":
-    client.run(DISCORD_TOKEN)
+    print("🚀 봇 실행 준비 중...")
+    # test_connection()  # 데이터베이스 연결 테스트 실행 -> 데이터 베이스 정상 작동 ✅
+    client.run(DISCORD_TOKEN) 
