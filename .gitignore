@@ -3,3 +3,5 @@
 # __pycache__ 디렉토리를 Git에서 제외
 __pycache__/
 *.pyc
+
+.DS_Store
