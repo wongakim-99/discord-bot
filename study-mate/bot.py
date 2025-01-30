@@ -18,7 +18,7 @@ async def on_ready():  # 봇이 실행되면 한 번 실행됨
     print(f"Logged in as {client.user}")
     await client.change_presence(
         status=discord.Status.online, 
-        activity=discord.Game("개발 테스트 중입니다...")
+        activity=discord.Game("개발 테스트")
     )
 
 # 이벤트 및 명령어 등록
