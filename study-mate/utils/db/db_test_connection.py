@@ -5,7 +5,7 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # db_connection에서 get_connection 가져오기
-from utils.db_connection import get_connection
+from utils.db.db_connection import get_connection
 
 
 def test_connection():
