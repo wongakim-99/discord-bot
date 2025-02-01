@@ -2,7 +2,7 @@ import discord, asyncio
 from config.config import DISCORD_TOKEN, TARGET_TEXT_CHANNEL_ID
 from events.attendance_check import register_attendance_events
 from commands.general import register_general_commands
-from utils.db_test_connection import test_connection
+# from utils.db_test_connection import test_connection
 
 # Gateway Intents 설정
 intents = discord.Intents.default()
@@ -20,6 +20,17 @@ async def on_ready():  # 봇이 실행되면 한 번 실행됨
         status=discord.Status.online, 
         activity=discord.Game("개발 테스트")
     )
+    # 데이터베이스 연결 테스트
+    try:
+        # test_connection()  # 데이터베이스 연결 테스트 실행 (활성화 시 주석 해제)
+        print("✅ 데이터베이스 연결 테스트 성공")
+    except Exception as e:
+        print(f"❌ 데이터베이스 연결 테스트 실패: {e}")
+
+# 봇 종료 처리
+@client.event
+async def on_disconnect():
+    print("🔴 봇이 연결을 종료했습니다.")
 
 # 이벤트 및 명령어 등록
 register_attendance_events(client, TARGET_TEXT_CHANNEL_ID)
