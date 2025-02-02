@@ -47,12 +47,16 @@ def get_absent_users(current_date):
             sql = """
             SELECT u.id AS user_id, u.nickname
             FROM users u
-            LEFT JOIN attendance a
-            ON u.id = a.user_id AND DATE(a.entry_time) = %s
-            WHERE a.id IS NULL
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM attendance a
+                WHERE u.id = a.user_id AND DATE(a.entry_time) = %s
+            )
             """
             cursor.execute(sql, (current_date,))
-            return cursor.fetchall()
+            result = cursor.fetchall()
+            print(f"🛠️ 디버깅: absent_users = {result}")  # 디버깅 로그 추가
+            return result
     finally:
         connection.close()
 
@@ -68,12 +72,16 @@ def add_penalty(user_id, amount, reason):
             INSERT INTO penalties (user_id, amount, reason, status)
             VALUES (%s, %s, %s, 'nonpay')
             """
+            print(f"✅ 벌금 추가 준비: user_id={user_id}, amount={amount}, reason={reason}")
             cursor.execute(sql, (user_id, amount, reason))
         connection.commit()
+        print(f"✅ 벌금 추가 완료: user_id={user_id}")
+    except Exception as e:
+        print(f"❌ 벌금 추가 실패: {e}")
     finally:
         connection.close()
 
-
+        
 def update_attendance_exit(user_id, exit_time, duration):
     """퇴장 시간 및 체류 시간 업데이트"""
     connection = get_connection()

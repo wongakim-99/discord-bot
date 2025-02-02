@@ -1,7 +1,9 @@
 import discord, asyncio
 from config.config import DISCORD_TOKEN, TARGET_TEXT_CHANNEL_ID
-from events.attendance_check import register_attendance_events
+from events.attendances.attendance_check import register_attendance_events
+from events.penaltys.penalty_scheduler import penalty_scheduler
 from commands.general import register_general_commands
+
 # from utils.db_test_connection import test_connection
 
 # Gateway Intents 설정
@@ -16,6 +18,7 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():  # 봇이 실행되면 한 번 실행됨
     print(f"Logged in as {client.user}")
+    asyncio.create_task(penalty_scheduler())  # 스케줄러 실행
     await client.change_presence(
         status=discord.Status.online, 
         activity=discord.Game("개발 테스트")

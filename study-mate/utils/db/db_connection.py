@@ -18,5 +18,6 @@ def get_connection():
         user=DB_USER,
         password=DB_PASSWORD,
         database=DB_NAME,
-        cursorclass=pymysql.cursors.DictCursor
+        cursorclass=pymysql.cursors.DictCursor,
+        charset='utf8mb4'  # UTF-8 설정 추가
     )
