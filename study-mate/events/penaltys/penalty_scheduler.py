@@ -4,14 +4,26 @@ from events.penaltys.penalty_manager import apply_penalties
 
 async def penalty_scheduler():
     """
-    매일 정해진 시간에 벌금을 부과하는 스케줄러
+    매일 토요일, 일요일 14:15에 벌금을 부과하는 스케줄러
     """
+    has_applied_today = False  # 벌금이 오늘 이미 부과되었는지 확인하는 플래그
+
     while True:
         now = datetime.now()
-        print(f"📅 현재 시간: {now}")
+        # print(f"📅 현재 시간: {now}")
 
-        # 매주 토요일, 일요일 14:15에 벌금 부과
-        await apply_penalties()
+        # 현재 요일 확인 (토요일=5, 일요일=6)
+        if now.weekday() in [5, 6]:  # 토요일, 일요일
+            # 14:15에 벌금 부과
+            if now.hour == 14 and now.minute == 15:
+                if not has_applied_today:
+                    print("🚨 벌금 부과 시작!")
+                    await apply_penalties()
+                    has_applied_today = True  # 벌금 부과 완료 플래그 설정
+            else:
+                has_applied_today = False  # 시간이 지나면 플래그 초기화
+        else:
+            has_applied_today = False  # 평일에는 플래그 초기화
 
-        # 5분 간격으로 반복
-        await asyncio.sleep(3600)
+        # 1분 간격으로 확인
+        await asyncio.sleep(25)

@@ -10,7 +10,7 @@ async def apply_penalties():
 
     # 토요일(5) 또는 일요일(6)인지 확인
     if now.weekday() in [5, 6]:
-        penalty_time = now.replace(hour=00, minute=00, second=0, microsecond=0)
+        penalty_time = now.replace(hour=14, minute=15, second=0, microsecond=0)  # 현재 테스트용
         
         if now >= penalty_time:
             current_date = now.strftime("%Y-%m-%d")
@@ -28,4 +28,4 @@ async def apply_penalties():
                 reason = "출석하지 않음"
 
                 add_penalty(user_id, amount, reason)
-                print(f"✅ 벌금 부과: {nickname}님에게 {amount}원 벌금 부과")
+                print(f"✅ {nickname} 벌금 {amount} ㅅㄱ")
