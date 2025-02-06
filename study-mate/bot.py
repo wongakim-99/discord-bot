@@ -41,6 +41,6 @@ register_general_commands(client)
 
 # 봇 실행
 if __name__ == "__main__":
-    print("🚀 봇 실행 준비 중...")
+    print("🚀 봇 실행 준비 중")
     # test_connection()  # 데이터베이스 연결 테스트 실행 -> 데이터 베이스 정상 작동 ✅
     client.run(DISCORD_TOKEN) 
