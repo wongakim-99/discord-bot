@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 from events.penaltys.penalty_manager import apply_penalties
+from config.config import STUDY_DAYS, STUDY_START_HOUR, STUDY_START_MINUTE, PENALTY_END_HOUR, PENALTY_END_MINUTE
 
 async def penalty_scheduler():
     """
@@ -13,9 +14,10 @@ async def penalty_scheduler():
         print(f"현재 시간: {now}, 요일: {now.weekday()}")
 
         # 현재 요일 확인 (토요일=5, 일요일=6)
-        if now.weekday() in [4, 5]:  # 토요일, 일요일
-            # 14:15에 벌금 부과
-            if (now.hour == 14 and now.minute >= 15) or (14 < now.hour < 19) or (now.hour == 19 and now.minute <= 30):
+        if now.weekday() in STUDY_DAYS:  # 지정된 스터디 요일 확인
+            if (now.hour == STUDY_START_HOUR and now.minute >= STUDY_START_MINUTE) or \
+                    (STUDY_START_HOUR < now.hour < PENALTY_END_HOUR) or \
+                    (now.hour == PENALTY_END_HOUR and now.minute <= PENALTY_END_MINUTE):
                 if not has_applied_today:
                     print("🚨 벌금 부과 시작!")
                     await apply_penalties()

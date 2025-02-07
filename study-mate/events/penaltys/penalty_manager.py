@@ -1,5 +1,6 @@
 from datetime import datetime
 from utils.db.queries.db_queries import get_absent_users, add_penalty, get_last_penalty_stack
+from config.config import STUDY_DAYS, STUDY_START_HOUR, STUDY_START_MINUTE
 
 async def apply_penalties():
     print("김영웅, 허준 벌금기원, 지각하면 뒤지는거야")
@@ -9,8 +10,8 @@ async def apply_penalties():
     now = datetime.now()
 
     # 토요일(5) 또는 일요일(6)인지 확인
-    if now.weekday() in [4, 5]:
-        penalty_time = now.replace(hour=14, minute=15, second=0, microsecond=0)  # 현재 테스트용
+    if now.weekday() in STUDY_DAYS:
+        penalty_time = now.replace(hour=STUDY_START_HOUR, minute=STUDY_START_MINUTE, second=0, microsecond=0)
         
         if now >= penalty_time:
             current_date = now.strftime("%Y-%m-%d")

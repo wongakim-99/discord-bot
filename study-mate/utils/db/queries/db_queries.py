@@ -145,3 +145,21 @@ def get_last_penalty_stack(user_id):
             return result["stack_count"] if result else 0
     finally:
         connection.close()
+
+
+def get_user_id_by_discord_id(discord_id):
+    """
+    디스코드 사용자 ID로 users 테이블의 내부 ID 조회
+    """
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT id FROM users WHERE discord_id = %s"
+            cursor.execute(sql, (discord_id,))
+            result = cursor.fetchone()
+            if result:
+                return result['id']  # 내부 ID 반환
+            else:
+                return None  # 디스코드 ID가 없으면 None 반환
+    finally:
+        connection.close()
