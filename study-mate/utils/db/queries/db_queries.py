@@ -96,3 +96,31 @@ def update_attendance_exit(user_id, exit_time, duration):
         connection.commit()
     finally:
         connection.close()
+
+
+def get_last_penalty_amount(user_id):
+    """
+    특정 사용자의 마지막 벌금 금액 조회
+    """
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT amount
+            FROM penalties
+            WHERE user_id = %s
+            ORDER BY id DESC  -- 가장 최근 벌금을 가져오기 위해 id 내림차순 정렬
+            LIMIT 1
+            """
+            cursor.execute(sql, (user_id,))
+            result = cursor.fetchone()
+
+            # 벌금이 없으면 None 반환
+            if result:
+                print(f"🛠️ 디버깅: 마지막 벌금 금액 = {result['amount']}")
+                return result["amount"]
+            else:
+                print(f"🛠️ 디버깅: 이전 벌금 없음")
+                return 0  # 기존 벌금이 없으면 0 반환
+    finally:
+        connection.close()
