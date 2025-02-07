@@ -1,5 +1,5 @@
 from datetime import datetime
-from utils.db.queries.db_queries import get_absent_users, add_penalty, get_last_penalty_amount
+from utils.db.queries.db_queries import get_absent_users, add_penalty, get_last_penalty_stack
 
 async def apply_penalties():
     print("김영웅, 허준 벌금기원, 지각하면 뒤지는거야")
@@ -25,12 +25,13 @@ async def apply_penalties():
                 user_id = user["user_id"]
                 nickname = user["nickname"]
                 
-                # 기존 벌금 조회
-                last_penalty_amount = get_last_penalty_amount(user_id)
+                # 기존 스택 값 조회
+                last_stack = get_last_penalty_stack(user_id)
+                new_stack = last_stack + 1
 
                 # 벌금 계산 로직(기존 벌금이 있으면 2배, 없으면 기본값 2000원 부과)
-                amount = last_penalty_amount * 2 if last_penalty_amount else 2000
-                reason = "출석하지 않음"
+                amount = 2000 * (2 ** (new_stack - 1))
+                reason = "무단 결석"
                 
-                add_penalty(user_id, amount, reason)
+                add_penalty(user_id, amount, reason, new_stack)
                 print(f"✅ {nickname} 벌금 {amount} ㅅㄱ")

@@ -61,7 +61,7 @@ def get_absent_users(current_date):
         connection.close()
 
 
-def add_penalty(user_id, amount, reason):
+def add_penalty(user_id, amount, reason, stack_count):
     """
     벌금 기록 추가
     """
@@ -69,11 +69,11 @@ def add_penalty(user_id, amount, reason):
     try:
         with connection.cursor() as cursor:
             sql = """
-            INSERT INTO penalties (user_id, amount, reason, status)
-            VALUES (%s, %s, %s, 'nonpay')
+            INSERT INTO penalties (user_id, amount, reason, status, stack_count)
+            VALUES (%s, %s, %s, 'nonpay', %s)
             """
-            print(f"✅ 벌금 추가 준비: user_id={user_id}, amount={amount}, reason={reason}")
-            cursor.execute(sql, (user_id, amount, reason))
+            print(f"✅ 벌금 추가 준비: user_id={user_id}, amount={amount}, reason={reason}, stack={stack_count}")
+            cursor.execute(sql, (user_id, amount, reason, stack_count))
         connection.commit()
         print(f"✅ 벌금 추가 완료: user_id={user_id}")
     except Exception as e:
@@ -122,5 +122,26 @@ def get_last_penalty_amount(user_id):
             else:
                 print(f"🛠️ 디버깅: 이전 벌금 없음")
                 return 0  # 기존 벌금이 없으면 0 반환
+    finally:
+        connection.close()
+
+
+def get_last_penalty_stack(user_id):
+    """
+    사용자의 최근 벌금 스택 값을 가져옵니다. 없으면 0을 반환.
+    """
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT stack_count
+            FROM penalties
+            WHERE user_id = %s
+            ORDER BY date_issued DESC
+            LIMIT 1
+            """
+            cursor.execute(sql, (user_id,))
+            result = cursor.fetchone()
+            return result["stack_count"] if result else 0
     finally:
         connection.close()
