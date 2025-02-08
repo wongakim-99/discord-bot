@@ -13,7 +13,10 @@ async def apply_penalties():
     if now.weekday() in STUDY_DAYS:
         penalty_time = now.replace(hour=STUDY_START_HOUR, minute=STUDY_START_MINUTE, second=0, microsecond=0)
         penalty_end_time = now.replace(hour=PENALTY_END_HOUR, minute=PENALTY_END_MINUTE, second=0, microsecond=0)
-        
+
+        print(f"벌금 부과 시작 시간: {penalty_time}")
+        print(f"벌금 부과 종료 시간: {penalty_end_time}")
+
         if penalty_time <= now <= penalty_end_time:
             current_date = now.strftime("%Y-%m-%d")
 

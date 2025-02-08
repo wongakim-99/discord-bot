@@ -28,4 +28,4 @@ async def penalty_scheduler():
             has_applied_today = False  # 평일에는 플래그 초기화
 
         # 1분 간격으로 확인
-        await asyncio.sleep(25)
+        await asyncio.sleep(20)

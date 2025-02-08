@@ -47,16 +47,19 @@ def get_absent_users(current_date):
             sql = """
             SELECT u.id AS user_id, u.nickname
             FROM users u
-            WHERE NOT EXISTS (
-                SELECT 1
-                FROM attendance a
-                WHERE u.id = a.user_id AND DATE(a.entry_time) = %s
-            )
+            LEFT JOIN attendance a ON u.id = a.user_id AND DATE(a.entry_time) = %s
+            LEFT JOIN penalties p ON u.id = p.user_id AND DATE(p.date_issued) = %s AND p.penalty_type = '지각'
+            LEFT JOIN late_reasons lr ON p.id = lr.penalty_id
+            WHERE a.id IS NULL  -- 출석 기록이 없는 사용자
+              AND lr.id IS NULL -- 지각 사유를 제출하지 않은 사용자
             """
-            cursor.execute(sql, (current_date,))
+            cursor.execute(sql, (current_date, current_date))  # 두 개의 매개변수 전달
             result = cursor.fetchall()
             print(f"🛠️ 디버깅: absent_users = {result}")  # 디버깅 로그 추가
             return result
+    except Exception as e:
+        print(f"❌ 출석하지 않은 사용자 조회 실패: {e}")
+        return []
     finally:
         connection.close()
 
