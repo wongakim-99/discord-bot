@@ -61,7 +61,7 @@ def get_absent_users(current_date):
         connection.close()
 
 
-def add_penalty(user_id, amount, reason, stack_count):
+def add_penalty(user_id, amount, penalty_type, stack_count, detail_data):
     """
     벌금 기록 추가
     """
@@ -69,11 +69,35 @@ def add_penalty(user_id, amount, reason, stack_count):
     try:
         with connection.cursor() as cursor:
             sql = """
-            INSERT INTO penalties (user_id, amount, reason, status, stack_count)
+            INSERT INTO penalties (user_id, amount, penalty_type, status, stack_count)
             VALUES (%s, %s, %s, 'nonpay', %s)
             """
-            print(f"✅ 벌금 추가 준비: user_id={user_id}, amount={amount}, reason={reason}, stack={stack_count}")
-            cursor.execute(sql, (user_id, amount, reason, stack_count))
+            print(f"✅ 벌금 추가 준비: user_id={user_id}, amount={amount}, penalty_type={penalty_type}, stack={stack_count}")
+            cursor.execute(sql, (user_id, amount, penalty_type, stack_count))
+            penalty_id = cursor.lastrowid  # penalties 의 ID 가져오기
+
+            # 세부 테이블에 데이터 추가
+            if penalty_type == '지각':
+                detail_sql = """
+                            INSERT INTO late_reasons (penalty_id, nickname, submitted_reason)
+                            VALUES (%s, %s, %s)
+                            """
+                cursor.execute(detail_sql, (penalty_id, detail_data['nickname'], detail_data['reason']))
+
+            elif penalty_type == '무단결석':
+                detail_sql = """
+                            INSERT INTO absent_details (penalty_id, nickname, absence_date)
+                            VALUES (%s, %s, %s)
+                            """
+                cursor.execute(detail_sql, (penalty_id, detail_data['nickname'], detail_data['absence_date']))
+
+            elif penalty_type == '출튀':
+                detail_sql = """
+                            INSERT INTO escape_details (penalty_id, nickname, escape_reason)
+                            VALUES (%s, %s, %s)
+                            """
+                cursor.execute(detail_sql, (penalty_id, detail_data['nickname'], detail_data['reason']))
+
         connection.commit()
         print(f"✅ 벌금 추가 완료: user_id={user_id}")
     except Exception as e:
@@ -161,5 +185,25 @@ def get_user_id_by_discord_id(discord_id):
                 return result['id']  # 내부 ID 반환
             else:
                 return None  # 디스코드 ID가 없으면 None 반환
+    finally:
+        connection.close()
+
+
+def has_penalty_today(user_id, date):
+    """
+    특정 사용자에 대해 오늘 벌금이 이미 부과되었는지 확인
+    """
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            sql = """
+            SELECT COUNT(*) AS penalty_count FROM penalties
+            WHERE user_id = %s AND DATE(date_issued) = %s
+            """
+            cursor.execute(sql, (user_id, date))
+            result = cursor.fetchone()
+            if result and result['penalty_count'] > 0:
+                return True  # 벌금이 이미 부과된 경우
+            return False  # 벌금이 부과되지 않은 경우
     finally:
         connection.close()
